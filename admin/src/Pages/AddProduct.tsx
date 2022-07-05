@@ -12,7 +12,9 @@ import { useAlert } from "react-alert";
 import htmlToDraft from "html-to-draftjs";
 import axios from "axios";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { useIsAuth } from "../utils/useIsAuth";
 export default function AddProduct() {
+  useIsAuth();
   const alert = useAlert();
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty());

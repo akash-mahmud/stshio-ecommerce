@@ -18,6 +18,7 @@ import { validateRegister } from "../utils/validateRegister";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
 import { getConnection } from "typeorm";
+import debug from "debug";
 
 
 @ObjectType()
@@ -231,7 +232,7 @@ export class UserResolver {
     }
 
     req.session.userId = user.id;
-
+    debug(req.session.userId)
     return {
       user,
     };

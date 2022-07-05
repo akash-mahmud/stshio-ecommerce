@@ -5,6 +5,7 @@ import {
   fetchExchange,
   stringifyVariables,
 } from "urql";
+import {useNavigate} from 'react-router-dom'
 import { pipe, tap } from "wonka";
 import {
   LoginMutation,
@@ -16,16 +17,18 @@ import {
   DeletePostMutationVariables,
 } from "../generated/graphql";
 import { betterUpdateQuery } from "./betterUpdateQuery";
-import Router from "next/router";
+// import Router from "next/router";
 import gql from "graphql-tag";
 import { isServer } from "./isServer";
 
 const errorExchange: Exchange = ({ forward }) => (ops$) => {
+  const Navigate = useNavigate()
   return pipe(
     forward(ops$),
     tap(({ error }) => {
       if (error?.message.includes("not authenticated")) {
-        Router.replace("/login");
+        Navigate("/login");
+
       }
     })
   );

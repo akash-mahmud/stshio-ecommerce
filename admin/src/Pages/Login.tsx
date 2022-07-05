@@ -1,14 +1,58 @@
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async';
-
-export default function Login() {
-  const [userInfo, setuserInfo] = useState({
-
-  })
-  const login = async(e:any) => {
-  e.preventDefault()
-console.log(userInfo);
+import { useNavigate } from 'react-router-dom';
+import { useLoginMutation  , MeQuery, MeDocument } from '../generated/graphql';
+import { toErrorMap } from "../utils/toErrorMap";
+interface User {
+  usernameOrEmail: string;
+  password : string
 }
+export default function Login() {
+  const [userInfo, setuserInfo] = useState<User>({
+    usernameOrEmail: "",
+    password:""
+  })
+
+const navigate = useNavigate()
+
+  const [login] = useLoginMutation();
+
+
+  const loginDataSubmit = async(e:any  ) => {
+    e.preventDefault()
+    const values = { ...userInfo }
+
+    
+    const response = await login({
+      variables: values,
+      update: (cache, { data }) => {
+        cache.writeQuery<MeQuery>({
+          query: MeDocument,
+          data: {
+            __typename: "Query",
+            me: data?.login.user,
+          },
+        });
+        cache.evict({ fieldName: "posts:{}" });
+      },
+    });
+
+    if (response.data?.login.errors) {
+      // setErrors(toErrorMap(response.data.login.errors));
+    }
+    else if (response.data?.login.user) {
+      if (typeof 'data' === "string") {
+        // router.push(router.query.next);
+        // navigate("/");
+      } else {
+        // worked
+        console.log('Logged in');
+        
+        // navigate("/");
+      }
+    }
+    }
+
   return (
     <>
      <Helmet>
@@ -42,14 +86,14 @@ console.log(userInfo);
                   width:'50%'
                 }}>
                   
-                  <form method='POST' onSubmit={login} className="forms-sample">
+                  <form method='POST' onSubmit={loginDataSubmit} className="forms-sample">
                   
                     <div className="form-group">
                       <label htmlFor="myemail">Email address</label>
                       <input autoComplete="none" onChange={(e) => {
                         setuserInfo({
                           ...userInfo,
-                          email: e.target.value
+                          usernameOrEmail: e.target.value
                         })
                       }} type="email" className="form-control" id="myemail" placeholder="Email"/>
                     </div>

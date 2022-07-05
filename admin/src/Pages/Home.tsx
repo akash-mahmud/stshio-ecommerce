@@ -1,6 +1,8 @@
 import React from 'react'
 import { Helmet } from 'react-helmet-async';
+import { useIsAuth } from '../utils/useIsAuth';
 export default function Home() {
+  useIsAuth();
   return (
       <>
       <Helmet>
